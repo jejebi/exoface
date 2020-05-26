@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <title>EXO멤버와 닮은 얼굴 찾기</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Go to www.addthis.com/dashboard to customize your tools -->
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5ecd14f14d473f86"></script>
+
+    
+    
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">EXO 닮은 멤버 테스트</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Pricing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="section">
+        <h1 class="title">EXO 닮은꼴 찾기</h1>
+        <h2 class="subtitle">나는 어떤 멤버와 닮았을까?</h2>
+    </section>
+
+    <section class="youtube">
+
+        <div class="container mt-5 youtube-cover d-flex flex-row-reverse">
+
+            <img src="img/youtube-copy.jpg" alt="" class="youtube-icon">
+            <a href="" class="youtube-link">제제비</a>
+        </div>
+    </section>
+
+    <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <div class="mt-3 container file-upload">
+        <div class="image-upload-wrap">
+            <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
+            <div class="drag-text">
+                <img src="img/upload.svg" alt="" class="mt-5 pd-5 upload">
+                <h3 class="mt-5 pd-5 pt-4 upload-text">얼굴 사진을 올려 놓거나 눌러서 업로드 하세요!</h3>
+            </div>
+        </div>
+        <div class="file-upload-content">
+            <img class="file-upload-image" id="face-image" src="#" alt="your image" />
+
+            <div id="loading" class="animated bounce">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p class="text-center">AI가 당신의 얼굴을 분석중입니다.</p>
+            </div>
+            <p class="result-message"></p>
+            <div id="label-container" class="d-flex flex-column justify-content-around"></div>
+            <div id="addThis" class="addthis_inline_share_toolbox_6lz1"></div>
+
+            
+                <!-- Go to www.addthis.com/dashboard to customize your tools -->
+                <div class="addthis_inline_share_toolbox"></div>
+            
+            
+            
+            <div class="pt-3 image-title-wrap">
+                <button type="button p-2" class="try-again-btn" onclick="window.location.reload();">
+                    <span class="try-again-text">다른 사진으로 재시도</span>
+                </button>
+                
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+    <div id="webcam-container"></div>
+    <div id="label-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('.image-upload-wrap').hide();
+                    $('#loading').show();
+                    $('.file-upload-image').attr('src', e.target.result);
+                    $('.file-upload-content').show();
+                    $('.image-title').html(input.files[0].name);
+                };
+                reader.readAsDataURL(input.files[0]);
+                init().then(function() {
+                    console.log("hello");
+                    predict();
+                    $('#loading').hide();
+                });
+            } else {
+                removeUpload();
+            }
+        }
+
+        function removeUpload() {
+            $('.file-upload-input').replaceWith($('.file-upload-input').clone());
+            $('.file-upload-content').hide();
+            $('.image-upload-wrap').show();
+        }
+        $('.image-upload-wrap').bind('dragover', function() {
+            $('.image-upload-wrap').addClass('image-dropping');
+        });
+        $('.image-upload-wrap').bind('dragleave', function() {
+            $('.image-upload-wrap').removeClass('image-dropping');
+        });
+    </script>
+
+    <script type="text/javascript">
+        // More API functions here:
+        // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+        // the link to your model provided by Teachable Machine export panel
+        const URL = "https://teachablemachine.withgoogle.com/models/p_uexTaqW/";
+        let model, webcam, labelContainer, maxPredictions;
+        // Load the image model and setup the webcam
+        async function init() {
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+            // load the model and metadata
+            // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+            // or files from your local hard drive
+            // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+            model = await tmImage.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
+            labelContainer = document.getElementById("label-container");
+            for (let i = 0; i < maxPredictions; i++) { // and class labels
+                labelContainer.appendChild(document.createElement("div"));
+            }
+        }
+        // run the webcam image through the image model
+        async function predict() {
+            // predict can take in an image, video or canvas html element
+            var image = document.getElementById("face-image");
+            const prediction = await model.predict(image, false);
+            prediction.sort((a, b) => parseFloat(b.probability) - parseFloat(a.probability));
+            console.log(prediction[0].className);
+            var resultTitle, resultExplain, resultCeleb;
+            switch (prediction[0].className) {
+                case "Chanyeol":
+                    resultTitle = "박찬열"
+                    resultExplain = "팝콘 입에 넣은 채 쳐다보게 만드는 당신은 얼굴 맛집 EXO의 대형견 알찬열매 찬열을 닮았군요! 덩치와 비례하는 귀여움과 도비 귀를 가진 당신은 해피바이러스를 몰고 다니는 존재감 뿜뿜 열정 부자입니다"
+                    resultCeleb = "#3분 1초 #짜녀리 #댕댕미 #사실은요다 #용안"
+                    break;
+                case "Sehun":
+                    resultTitle = "오세훈"
+                    resultExplain = "인성파티로 고고하고 싶은 당신은 얼굴 맛집 EXO의 떡볶이 먹다 캐스팅 당한 세훈을 닮았군요! 얼굴은 차도남이지만 마음이 여리고 착한 당신은 애교가 많은 영원한 사랑둥이 막내입니다."
+                    resultCeleb = "#윌리스 #삐약이 #비비아빠 #오세흥"
+                    break;
+                case "Chen":
+                    resultTitle = "김종대"
+                    resultExplain = "장난끼 넘치는 비글아이와 개구장이 입꼬리를 가진 당신은 얼굴 맛집 EXO의 첸을 닮았군요! 낮에도 찡찡 밤에도 찡찡대지만 항상 다정한 당신은 광대로 노래하는 공룡상 낙타입니다."
+                    resultCeleb = "#첸싱머신 #종따이 #비글대장 #김종대디..."
+                    break;
+                case "Kai":
+                    resultTitle = "김종인"
+                    resultExplain = "someone call the doctor!를 외치고 싶을만큼 치명적인 비주얼을 가진 당신은 얼굴 맛집 EXO의 카이를 닮았군요! 겉으로는 세상 쎄보이지만 사실 소중하고 섬세한 소년같은 감성을 가진 사람입니다."
+                    resultCeleb = "#김카이 #니니 #곰인이 #핫바디"
+                    break;
+                case "Suho":
+                    resultTitle = "김준면"
+                    resultExplain = "사랑하자!를 외치고 싶을만큼 깨끗하고 투명한 비주얼을 가진 당신은 얼굴 맛집 EXO의 수호를 닮았군요! 꾸준한 관리와 피나는 노력으로 사람들을 감동시키는 당신은 열정 만수르 입니다."
+                    resultCeleb = "#준멘 #목각이 #상견례프리패스 #WEAREONE"
+                    break;
+                case "Lay":
+                    resultTitle = "장이씽"
+                    resultExplain = "양처럼 순한 얼굴에 소같은 눈망울을 가진 당신은 얼굴 맛집 EXO의 레이를 닮았군요! 가끔은 엉뚱한 말과 행동으로 의도치않게 웃음을 주는 당신은 편안한 안식처같은 유니콘입니다."
+                    resultCeleb = "#이씽이 #씽씽이 #장레이"
+                    break;
+                case "Xiumin":
+                    resultTitle = "김민석"
+                    resultExplain = "널 망쳐놓을 거야! 내 인생을 망치러 온 구원자와 처럼 요정같은 비주얼을 가진 당신은 얼굴 맛집 EXO의 시우민을 닮았군요! 통통한 볼살로 찹쌀떡을 씹어먹으면 모두들 마른 잇몸을 드러내며 당신을 향해 웃을겁니다."
+                    resultCeleb = "#슈밍 #요정 #만두"
+                    break;
+                case "Do":
+                    resultTitle = "도경수"
+                    resultExplain = "맑고 큰 눈과 웃을 떄 나타나는 하트 입술로 소년미가 철철 흘러 넘치는 당신은 얼굴 맛집 EXO의 디오를 닮았군요! 과묵하고 남자답지만 가끔 꾸러기같은 모습으로 알다가도 모를 당신은 보물같은 사람입니다."
+                    resultCeleb = "#됴 #알모경 #뚜뚜 #도디오"
+                    break;
+                case "Baekhyun":
+                    resultTitle = "변백현"
+                    resultExplain = "사랑스럽고 귀여운 멍뭉이 얼굴을 가진 당신은 얼굴 맛집 EXO의 백현을 닮았군요! 다재다능한 모습으로 어딜가든 사랑받는 당신은 다정한 마음씨까지 겸비한 귀엽둥이. 좋은 에너지로 항상 당신이 있는 곳을 즐겁게 만드는 사람입니다."
+                    resultCeleb = "#본투비아이돌 #갱얼쥐 #배큥 #천재아이돌"
+                    break;
+                default:
+                    resultTitle = "알수없음"
+                    resultExplain = ""
+                    resultCeleb = ""
+            }
+            var title = "<div class='" + prediction[0].className + "-animal-title'>" + resultTitle + "</div>"
+            var explain = "<div class='animal-explain pt-2'>" + resultExplain + "</div>"
+            var celeb = "<div class='" + prediction[0].className + "-animal-celeb pt-2 pb-2'>" + resultCeleb + "</div>"
+            $('.result-message').html(title + explain + celeb);
+            var barWidth;
+            for (let i = 0; i < maxPredictions; i++) {
+                if (prediction[i].probability.toFixed(2) > 0.1) {
+                    barWidth = Math.round(prediction[i].probability.toFixed(2) * 100) + "%";
+                } else if (prediction[i].probability.toFixed(2) >= 0.01) {
+                    barWidth = "4%"
+                } else {
+                    barWidth = "2%"
+                }
+                var labelTitle;
+                switch (prediction[i].className) {
+                    case "Chanyeol":
+                        labelTitle = "박찬열상"
+                        break;
+                    case "Sehun":
+                        labelTitle = "오세훈상"
+                        break;
+                    case "Chen":
+                        labelTitle = "김종대상"
+                        break;
+                    case "Kai":
+                        labelTitle = "김종인상"
+                        break;
+                    case "Suho":
+                        labelTitle = "김준면상"
+                        break;
+                    case "Lay":
+                        labelTitle = "장이씽상"
+                        break;
+                    case "Xiumin":
+                        labelTitle = "김민석상"
+                        break;
+                    case "Do":
+                        labelTitle = "도경수상"
+                        break;
+                    case "Baekhyun":
+                        labelTitle = "변백현상"
+                        break;
+                    default:
+                        labelTitle = "알수없음"
+                }
+                var label = "<div class='animal-label d-flex align-items-center'>" + labelTitle + "</div>"
+                var bar = "<div class='bar-container position-relative container'><div class='" + prediction[i].className + "-box'></div><div class='d-flex justify-content-center align-items-center " + prediction[i].className + "-bar' style='width: " + barWidth + "'><span class='d-block percent-text'>" + Math.round(prediction[i].probability.toFixed(2) * 100) + "%</span></div></div>"
+                labelContainer.childNodes[i].innerHTML = label + bar;
+            }
+        }
+    </script>
+
+    <div id="disqus_thread"></div>
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document,
+                s = d.createElement('script');
+            s.src = 'https://jejebi3.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the
+        <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+    </noscript>
+
+    <footer class="footer pt-5 container d-flex justify-content-center">
+        <div>
+            <p>&copy; 제제비 jejebi 2020. All Rights Reserved. </p>
+        </div>
+    </footer>
+
+</body>
+
+<!-- Copyright (c) 2020 by Aaron Vanston (https://codepen.io/aaronvanston/pen/yNYOXR)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ -->
+
+</html>
